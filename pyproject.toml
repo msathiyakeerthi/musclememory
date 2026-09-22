@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.25,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "musclememory"
+version = "0.1.0"
+description = "Muscle Memory: agents that get better with practice. A drop-in self-learning loop (memory + skills + background reviewer) for any LLM agent."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "M Sathiyakeerthi" }]
+keywords = ["llm", "agents", "memory", "skills", "self-learning", "ai-agents"]
+dependencies = []  # the core is stdlib-only; provider SDKs are optional extras
+
+[project.urls]
+Homepage = "https://github.com/msathiyakeerthi/musclememory"
+Source = "https://github.com/msathiyakeerthi/musclememory"
+Issues = "https://github.com/msathiyakeerthi/musclememory/issues"
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.60,<2"]
+bedrock = ["anthropic[bedrock]>=0.60,<2"]
+openai = ["openai>=1.40,<3"]
+langchain = ["langchain-core>=0.3,<2"]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+musclememory = "musclememory.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/musclememory"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

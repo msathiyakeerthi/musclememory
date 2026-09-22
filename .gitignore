@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# learning profiles created by the examples (may hold personal data)
+.musclememory/
+demo-profile/
