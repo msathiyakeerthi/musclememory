@@ -1,0 +1,708 @@
+{
+ "mode": "offline",
+ "days": [
+  {
+   "number": 1,
+   "label": "Tuesday",
+   "chats": [
+    {
+     "day": "Tuesday",
+     "clock": "09:14",
+     "task": "restaurant",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Book us a table for four this Friday at 7."
+      },
+      {
+       "role": "assistant",
+       "text": "Happy to. Any dietary preferences I should work around?",
+       "question": true
+      },
+      {
+       "role": "person",
+       "text": "We're all vegetarian, so somewhere with proper vegetarian mains."
+      },
+      {
+       "role": "assistant",
+       "text": "And roughly what budget per person?",
+       "question": true
+      },
+      {
+       "role": "person",
+       "text": "Around 30 a head, nothing fancy."
+      },
+      {
+       "role": "action",
+       "text": "Looked for restaurants",
+       "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+       "do": "search_restaurants"
+      },
+      {
+       "role": "action",
+       "text": "Booked the table",
+       "detail": "Booked: The Gate, Friday 19:00, four people",
+       "do": "book_table"
+      },
+      {
+       "role": "assistant",
+       "text": "Booked - I've put it in your calendar."
+      },
+      {
+       "role": "person",
+       "text": "You booked over the school run - please always check my calendar before booking anything.",
+       "correction": true
+      },
+      {
+       "role": "assistant",
+       "text": "Sorry about that - I'll remember."
+      }
+     ],
+     "questions": 2,
+     "corrections": 1,
+     "exchanges": 10
+    },
+    {
+     "day": "Tuesday",
+     "clock": "18:40",
+     "task": "groceries",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Can you put in the weekly grocery order?"
+      },
+      {
+       "role": "assistant",
+       "text": "Sure - anything the household doesn't eat?",
+       "question": true
+      },
+      {
+       "role": "person",
+       "text": "Nothing with meat in it."
+      },
+      {
+       "role": "action",
+       "text": "Filled the basket",
+       "detail": "Basket ready: the usual weekly list, no meat",
+       "do": "order_groceries"
+      },
+      {
+       "role": "assistant",
+       "text": "Basket is ready (all vegetarian) - shall I place it?"
+      },
+      {
+       "role": "person",
+       "text": "Please take the peanut butter off - my son is allergic to peanuts, so no peanuts ever.",
+       "correction": true
+      },
+      {
+       "role": "assistant",
+       "text": "Sorry about that - I'll remember."
+      }
+     ],
+     "questions": 1,
+     "corrections": 1,
+     "exchanges": 7
+    }
+   ],
+   "learned": [
+    "learned: memory add [user]: The household is vegetarian - no meat or fish, ever.; memory add [user]: No peanuts in anything - the son has a peanut allergy.; memory add [user]: Eating out: around 30 a head unless told otherwise.; skill create: book-a-restaurant; skill create: weekly-grocery-order"
+   ],
+   "store": {
+    "memory": [
+     "The household is vegetarian - no meat or fish, ever.",
+     "No peanuts in anything - the son has a peanut allergy.",
+     "Eating out: around 30 a head unless told otherwise."
+    ],
+    "skills": [
+     {
+      "name": "book-a-restaurant",
+      "description": "Book a restaurant the way this household likes it.",
+      "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Check the calendar before booking - evenings often have the school run.\n"
+     },
+     {
+      "name": "weekly-grocery-order",
+      "description": "Place the household's weekly grocery order.",
+      "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+     }
+    ]
+   }
+  },
+  {
+   "number": 2,
+   "label": "Thursday",
+   "chats": [
+    {
+     "day": "Thursday",
+     "clock": "11:02",
+     "task": "restaurant",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Dinner for my parents on Saturday, same sort of place."
+      },
+      {
+       "role": "action",
+       "text": "Checked the calendar",
+       "detail": "Clash: Friday 19:00 - school run. Free from 20:00.",
+       "do": "check_calendar"
+      },
+      {
+       "role": "action",
+       "text": "Looked for restaurants",
+       "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+       "do": "search_restaurants"
+      },
+      {
+       "role": "action",
+       "text": "Booked the table",
+       "detail": "Booked: The Gate, Friday 19:00, four people",
+       "do": "book_table"
+      },
+      {
+       "role": "assistant",
+       "text": "Booked - I've put it in your calendar."
+      },
+      {
+       "role": "person",
+       "text": "Next time check with me before you actually book - I'd have picked the later slot.",
+       "correction": true
+      },
+      {
+       "role": "assistant",
+       "text": "Sorry about that - I'll remember."
+      }
+     ],
+     "questions": 0,
+     "corrections": 1,
+     "exchanges": 7
+    },
+    {
+     "day": "Thursday",
+     "clock": "20:15",
+     "task": "trip",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Plan us a weekend by the coast next month."
+      },
+      {
+       "role": "assistant",
+       "text": "And would you rather drive or take the train?",
+       "question": true
+      },
+      {
+       "role": "person",
+       "text": "We'd rather take the train than drive."
+      },
+      {
+       "role": "action",
+       "text": "Looked up trips",
+       "detail": "Whitstable by train, 2 nights, 540 total for three",
+       "do": "search_trips"
+      },
+      {
+       "role": "assistant",
+       "text": "Whitstable by train, two nights, 540 for the three of you. Want me to hold it?"
+      }
+     ],
+     "questions": 1,
+     "corrections": 0,
+     "exchanges": 5
+    }
+   ],
+   "learned": [
+    "learned: memory add [user]: Prefers the train over driving for trips.; skill patch: book-a-restaurant; skill create: plan-a-weekend-trip"
+   ],
+   "store": {
+    "memory": [
+     "The household is vegetarian - no meat or fish, ever.",
+     "No peanuts in anything - the son has a peanut allergy.",
+     "Eating out: around 30 a head unless told otherwise.",
+     "Prefers the train over driving for trips."
+    ],
+    "skills": [
+     {
+      "name": "book-a-restaurant",
+      "description": "Book a restaurant the way this household likes it.",
+      "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Offer the option and wait for a yes; never book without confirming.\n- Check the calendar before booking - evenings often have the school run.\n"
+     },
+     {
+      "name": "plan-a-weekend-trip",
+      "description": "Plan a weekend away for the family.",
+      "body": "---\nname: plan-a-weekend-trip\ndescription: \"Plan a weekend away for the family.\"\n---\n\n1. Find trips that match the budget and how they like to travel.\n\n## What matters\n- Say what was booked or ordered, in one line.\n"
+     },
+     {
+      "name": "weekly-grocery-order",
+      "description": "Place the household's weekly grocery order.",
+      "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+     }
+    ]
+   }
+  },
+  {
+   "number": 3,
+   "label": "Monday",
+   "chats": [
+    {
+     "day": "Monday",
+     "clock": "08:05",
+     "task": "groceries",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Weekly shop, please."
+      },
+      {
+       "role": "action",
+       "text": "Filled the basket",
+       "detail": "Basket ready: the usual weekly list, no meat, nothing with peanuts",
+       "do": "order_groceries"
+      },
+      {
+       "role": "assistant",
+       "text": "Basket is ready (all vegetarian, no peanuts) - shall I place it?"
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 3
+    },
+    {
+     "day": "Monday",
+     "clock": "17:30",
+     "task": "restaurant",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Table for two on Wednesday evening?"
+      },
+      {
+       "role": "action",
+       "text": "Checked the calendar",
+       "detail": "Clash: Friday 19:00 - school run. Free from 20:00.",
+       "do": "check_calendar"
+      },
+      {
+       "role": "action",
+       "text": "Looked for restaurants",
+       "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+       "do": "search_restaurants"
+      },
+      {
+       "role": "assistant",
+       "text": "The Gate has 20:00 free - vegetarian, about 28 a head. Shall I book that?",
+       "confirm": true
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 4
+    }
+   ],
+   "learned": [
+    "nothing to save"
+   ],
+   "store": {
+    "memory": [
+     "The household is vegetarian - no meat or fish, ever.",
+     "No peanuts in anything - the son has a peanut allergy.",
+     "Eating out: around 30 a head unless told otherwise.",
+     "Prefers the train over driving for trips."
+    ],
+    "skills": [
+     {
+      "name": "book-a-restaurant",
+      "description": "Book a restaurant the way this household likes it.",
+      "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Offer the option and wait for a yes; never book without confirming.\n- Check the calendar before booking - evenings often have the school run.\n"
+     },
+     {
+      "name": "plan-a-weekend-trip",
+      "description": "Plan a weekend away for the family.",
+      "body": "---\nname: plan-a-weekend-trip\ndescription: \"Plan a weekend away for the family.\"\n---\n\n1. Find trips that match the budget and how they like to travel.\n\n## What matters\n- Say what was booked or ordered, in one line.\n"
+     },
+     {
+      "name": "weekly-grocery-order",
+      "description": "Place the household's weekly grocery order.",
+      "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+     }
+    ]
+   }
+  },
+  {
+   "number": 4,
+   "label": "Wednesday",
+   "chats": [
+    {
+     "day": "Wednesday",
+     "clock": "09:47",
+     "task": "trip",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Another weekend away, this time in the hills."
+      },
+      {
+       "role": "action",
+       "text": "Looked up trips",
+       "detail": "Whitstable by train, 2 nights, 540 total for three",
+       "do": "search_trips"
+      },
+      {
+       "role": "assistant",
+       "text": "Whitstable by train, two nights, 540 for the three of you. Want me to hold it?"
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 3
+    },
+    {
+     "day": "Wednesday",
+     "clock": "19:22",
+     "task": "groceries",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Same grocery order as last week."
+      },
+      {
+       "role": "action",
+       "text": "Filled the basket",
+       "detail": "Basket ready: the usual weekly list, no meat, nothing with peanuts",
+       "do": "order_groceries"
+      },
+      {
+       "role": "assistant",
+       "text": "Basket is ready (all vegetarian, no peanuts) - shall I place it?"
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 3
+    }
+   ],
+   "learned": [
+    "nothing to save"
+   ],
+   "store": {
+    "memory": [
+     "The household is vegetarian - no meat or fish, ever.",
+     "No peanuts in anything - the son has a peanut allergy.",
+     "Eating out: around 30 a head unless told otherwise.",
+     "Prefers the train over driving for trips."
+    ],
+    "skills": [
+     {
+      "name": "book-a-restaurant",
+      "description": "Book a restaurant the way this household likes it.",
+      "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Offer the option and wait for a yes; never book without confirming.\n- Check the calendar before booking - evenings often have the school run.\n"
+     },
+     {
+      "name": "plan-a-weekend-trip",
+      "description": "Plan a weekend away for the family.",
+      "body": "---\nname: plan-a-weekend-trip\ndescription: \"Plan a weekend away for the family.\"\n---\n\n1. Find trips that match the budget and how they like to travel.\n\n## What matters\n- Say what was booked or ordered, in one line.\n"
+     },
+     {
+      "name": "weekly-grocery-order",
+      "description": "Place the household's weekly grocery order.",
+      "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+     }
+    ]
+   }
+  },
+  {
+   "number": 5,
+   "label": "Friday",
+   "chats": [
+    {
+     "day": "Friday",
+     "clock": "10:10",
+     "task": "restaurant",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Lunch spot for my book club on Sunday?"
+      },
+      {
+       "role": "action",
+       "text": "Checked the calendar",
+       "detail": "Clash: Friday 19:00 - school run. Free from 20:00.",
+       "do": "check_calendar"
+      },
+      {
+       "role": "action",
+       "text": "Looked for restaurants",
+       "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+       "do": "search_restaurants"
+      },
+      {
+       "role": "assistant",
+       "text": "The Gate has 20:00 free - vegetarian, about 28 a head. Shall I book that?",
+       "confirm": true
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 4
+    },
+    {
+     "day": "Friday",
+     "clock": "16:55",
+     "task": "groceries",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Groceries again please."
+      },
+      {
+       "role": "action",
+       "text": "Filled the basket",
+       "detail": "Basket ready: the usual weekly list, no meat, nothing with peanuts",
+       "do": "order_groceries"
+      },
+      {
+       "role": "assistant",
+       "text": "Basket is ready (all vegetarian, no peanuts) - shall I place it?"
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 3
+    }
+   ],
+   "learned": [
+    "nothing to save"
+   ],
+   "store": {
+    "memory": [
+     "The household is vegetarian - no meat or fish, ever.",
+     "No peanuts in anything - the son has a peanut allergy.",
+     "Eating out: around 30 a head unless told otherwise.",
+     "Prefers the train over driving for trips."
+    ],
+    "skills": [
+     {
+      "name": "book-a-restaurant",
+      "description": "Book a restaurant the way this household likes it.",
+      "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Offer the option and wait for a yes; never book without confirming.\n- Check the calendar before booking - evenings often have the school run.\n"
+     },
+     {
+      "name": "plan-a-weekend-trip",
+      "description": "Plan a weekend away for the family.",
+      "body": "---\nname: plan-a-weekend-trip\ndescription: \"Plan a weekend away for the family.\"\n---\n\n1. Find trips that match the budget and how they like to travel.\n\n## What matters\n- Say what was booked or ordered, in one line.\n"
+     },
+     {
+      "name": "weekly-grocery-order",
+      "description": "Place the household's weekly grocery order.",
+      "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+     }
+    ]
+   }
+  },
+  {
+   "number": 6,
+   "label": "Tuesday",
+   "chats": [
+    {
+     "day": "Tuesday",
+     "clock": "12:30",
+     "task": "trip",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Half term is coming - somewhere by the sea again."
+      },
+      {
+       "role": "action",
+       "text": "Looked up trips",
+       "detail": "Whitstable by train, 2 nights, 540 total for three",
+       "do": "search_trips"
+      },
+      {
+       "role": "assistant",
+       "text": "Whitstable by train, two nights, 540 for the three of you. Want me to hold it?"
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 3
+    },
+    {
+     "day": "Tuesday",
+     "clock": "21:05",
+     "task": "restaurant",
+     "messages": [
+      {
+       "role": "person",
+       "text": "Anniversary dinner next Thursday, something a bit nicer."
+      },
+      {
+       "role": "action",
+       "text": "Checked the calendar",
+       "detail": "Clash: Friday 19:00 - school run. Free from 20:00.",
+       "do": "check_calendar"
+      },
+      {
+       "role": "action",
+       "text": "Looked for restaurants",
+       "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+       "do": "search_restaurants"
+      },
+      {
+       "role": "assistant",
+       "text": "The Gate has 20:00 free - vegetarian, about 28 a head. Shall I book that?",
+       "confirm": true
+      }
+     ],
+     "questions": 0,
+     "corrections": 0,
+     "exchanges": 4
+    }
+   ],
+   "learned": [
+    "nothing to save"
+   ],
+   "store": {
+    "memory": [
+     "The household is vegetarian - no meat or fish, ever.",
+     "No peanuts in anything - the son has a peanut allergy.",
+     "Eating out: around 30 a head unless told otherwise.",
+     "Prefers the train over driving for trips."
+    ],
+    "skills": [
+     {
+      "name": "book-a-restaurant",
+      "description": "Book a restaurant the way this household likes it.",
+      "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Offer the option and wait for a yes; never book without confirming.\n- Check the calendar before booking - evenings often have the school run.\n"
+     },
+     {
+      "name": "plan-a-weekend-trip",
+      "description": "Plan a weekend away for the family.",
+      "body": "---\nname: plan-a-weekend-trip\ndescription: \"Plan a weekend away for the family.\"\n---\n\n1. Find trips that match the budget and how they like to travel.\n\n## What matters\n- Say what was booked or ordered, in one line.\n"
+     },
+     {
+      "name": "weekly-grocery-order",
+      "description": "Place the household's weekly grocery order.",
+      "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+     }
+    ]
+   }
+  }
+ ],
+ "finale": {
+  "first": {
+   "day": "Tuesday",
+   "clock": "09:14",
+   "task": "restaurant",
+   "messages": [
+    {
+     "role": "person",
+     "text": "Book us a table for four this Friday at 7."
+    },
+    {
+     "role": "assistant",
+     "text": "Happy to. Any dietary preferences I should work around?",
+     "question": true
+    },
+    {
+     "role": "person",
+     "text": "We're all vegetarian, so somewhere with proper vegetarian mains."
+    },
+    {
+     "role": "assistant",
+     "text": "And roughly what budget per person?",
+     "question": true
+    },
+    {
+     "role": "person",
+     "text": "Around 30 a head, nothing fancy."
+    },
+    {
+     "role": "action",
+     "text": "Looked for restaurants",
+     "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+     "do": "search_restaurants"
+    },
+    {
+     "role": "action",
+     "text": "Booked the table",
+     "detail": "Booked: The Gate, Friday 19:00, four people",
+     "do": "book_table"
+    },
+    {
+     "role": "assistant",
+     "text": "Booked - I've put it in your calendar."
+    },
+    {
+     "role": "person",
+     "text": "You booked over the school run - please always check my calendar before booking anything.",
+     "correction": true
+    },
+    {
+     "role": "assistant",
+     "text": "Sorry about that - I'll remember."
+    }
+   ],
+   "questions": 2,
+   "corrections": 1,
+   "exchanges": 10
+  },
+  "now": {
+   "day": "the following week",
+   "clock": "09:14",
+   "task": "restaurant",
+   "messages": [
+    {
+     "role": "person",
+     "text": "Book us a table for four this Friday at 7."
+    },
+    {
+     "role": "action",
+     "text": "Checked the calendar",
+     "detail": "Clash: Friday 19:00 - school run. Free from 20:00.",
+     "do": "check_calendar"
+    },
+    {
+     "role": "action",
+     "text": "Looked for restaurants",
+     "detail": "The Gate - vegetarian, 28 a head, 2 tables left",
+     "do": "search_restaurants"
+    },
+    {
+     "role": "assistant",
+     "text": "The Gate has 20:00 free - vegetarian, about 28 a head. Shall I book that?",
+     "confirm": true
+    }
+   ],
+   "questions": 0,
+   "corrections": 0,
+   "exchanges": 4
+  },
+  "store": {
+   "memory": [
+    "The household is vegetarian - no meat or fish, ever.",
+    "No peanuts in anything - the son has a peanut allergy.",
+    "Eating out: around 30 a head unless told otherwise.",
+    "Prefers the train over driving for trips."
+   ],
+   "skills": [
+    {
+     "name": "book-a-restaurant",
+     "description": "Book a restaurant the way this household likes it.",
+     "body": "---\nname: book-a-restaurant\ndescription: \"Book a restaurant the way this household likes it.\"\n---\n\n1. Find a place that fits their diet and budget.\n2. Book the table.\n\n## What matters\n- Offer the option and wait for a yes; never book without confirming.\n- Check the calendar before booking - evenings often have the school run.\n"
+    },
+    {
+     "name": "plan-a-weekend-trip",
+     "description": "Plan a weekend away for the family.",
+     "body": "---\nname: plan-a-weekend-trip\ndescription: \"Plan a weekend away for the family.\"\n---\n\n1. Find trips that match the budget and how they like to travel.\n\n## What matters\n- Say what was booked or ordered, in one line.\n"
+    },
+    {
+     "name": "weekly-grocery-order",
+     "description": "Place the household's weekly grocery order.",
+     "body": "---\nname: weekly-grocery-order\ndescription: \"Place the household's weekly grocery order.\"\n---\n\n1. Fill the basket from the usual weekly list.\n\n## What matters\n- Never order anything with peanuts - it is an allergy, not a preference.\n"
+    }
+   ]
+  }
+ }
+}
