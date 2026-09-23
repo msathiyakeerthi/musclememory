@@ -10,3 +10,4 @@ dist/
 # learning profiles created by the examples (may hold personal data)
 .musclememory/
 demo-profile/
+assistant-profile/
