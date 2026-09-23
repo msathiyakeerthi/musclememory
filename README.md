@@ -66,6 +66,7 @@ That is the whole integration. Working, runnable versions:
 | [`examples/claude_agent.py`](examples/claude_agent.py) | Full Claude tool-use agent; `--bedrock REGION` for Amazon Bedrock |
 | [`examples/openai_agent.py`](examples/openai_agent.py) | Same on Chat Completions; `--base-url` for Ollama / vLLM / LM Studio |
 | [`examples/offline_demo.py`](examples/offline_demo.py) | The whole loop with **no API key**. Good for teaching |
+| [`examples/multi_session_demo.py`](examples/multi_session_demo.py) | 12 conversations over 6 sessions, then checks that session 7 is measurably better; `--real` to drive it with Claude |
 
 **LangChain / LangGraph:**
 
@@ -186,7 +187,7 @@ musclememory ledger [-n N] | rollback ID | curate
 
 ```bash
 pip install -e ".[dev,anthropic,openai,langchain]"
-pytest            # 68 tests, offline — a scripted stand-in plays the reviewer
+pytest            # 72 tests, offline — a scripted stand-in plays the reviewer
 ```
 
 Live-verified on Claude Opus 5 via Amazon Bedrock:

@@ -12,11 +12,12 @@ A virtualenv lives at `.venv/` (Windows: `.venv/Scripts/python.exe`).
 
 ```bash
 pip install -e ".[dev,anthropic,openai,langchain]"   # dev setup
-pytest                                               # full suite, offline (68 tests, ~3s)
+pytest                                               # full suite, offline (72 tests, ~4s)
 pytest tests/test_library.py                         # one file
 pytest tests/test_session.py::test_name              # one test
 pytest -k rollback                                   # by keyword
 python examples/offline_demo.py                      # whole loop end to end, no API key
+python examples/multi_session_demo.py                # 12 conversations, 6 sessions, then verified improvement
 musclememory --dir .musclememory status                    # CLI (entry point: musclememory.cli:main)
 ```
 
