@@ -67,6 +67,7 @@ That is the whole integration. Working, runnable versions:
 | [`examples/openai_agent.py`](examples/openai_agent.py) | Same on Chat Completions; `--base-url` for Ollama / vLLM / LM Studio |
 | [`examples/offline_demo.py`](examples/offline_demo.py) | The whole loop with **no API key**. Good for teaching |
 | [`examples/multi_session_demo.py`](examples/multi_session_demo.py) | 12 conversations over 6 sessions, then checks that session 7 is measurably better; `--real` to drive it with Claude |
+| [`docs/demo-ui.html`](docs/demo-ui.html) | A browser replay of that run: pick a session, watch the store fill up, see the session-7 checks |
 
 **LangChain / LangGraph:**
 

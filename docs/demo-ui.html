@@ -1,0 +1,426 @@
+<title>Muscle Memory Replay</title>
+<!-- Generated page: the TRACE below is injected from docs/demo-trace.json, produced by
+     `python examples/multi_session_demo.py --trace docs/demo-trace.json`. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">
+<style>
+  :root {
+    --ground: #f2f5f4;
+    --surface: #ffffff;
+    --surface-2: #e9eeed;
+    --line: #d2dcda;
+    --ink: #111b1c;
+    --ink-2: #4a5c5e;
+    --ink-3: #6f8183;
+    --skill: #0e6a60;
+    --skill-soft: #dcefec;
+    --memory: #574c8c;
+    --memory-soft: #e6e2f4;
+    --shift: #8a5310;
+    --shift-soft: #f6e9d8;
+    --before: #7a8b8d;
+    --ok: #0e6a60;
+    --radius: 10px;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "IBM Plex Serif", Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0c1213;
+      --surface: #131c1d;
+      --surface-2: #1b2527;
+      --line: #2a3739;
+      --ink: #e8efef;
+      --ink-2: #aebcbd;
+      --ink-3: #849799;
+      --skill: #57c6b6;
+      --skill-soft: #123430;
+      --memory: #b0a3e8;
+      --memory-soft: #241f3d;
+      --shift: #dda15e;
+      --shift-soft: #33260f;
+      --before: #6d7f81;
+      --ok: #57c6b6;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0c1213;
+    --surface: #131c1d;
+    --surface-2: #1b2527;
+    --line: #2a3739;
+    --ink: #e8efef;
+    --ink-2: #aebcbd;
+    --ink-3: #849799;
+    --skill: #57c6b6;
+    --skill-soft: #123430;
+    --memory: #b0a3e8;
+    --memory-soft: #241f3d;
+    --shift: #dda15e;
+    --shift-soft: #33260f;
+    --before: #6d7f81;
+    --ok: #57c6b6;
+  }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-family: var(--serif); font-size: clamp(28px, 4.4vw, 40px); letter-spacing: -0.015em; }
+  h2 { font-size: 15px; font-weight: 600; }
+  p { margin: 0; }
+  a { color: var(--skill); }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  .lede { color: var(--ink-2); max-width: 62ch; margin-top: 10px; }
+
+  header .row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: baseline; margin-top: 14px; }
+  .badge { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-radius: 999px;
+           padding: 3px 9px; color: var(--ink-2); background: var(--surface); }
+
+  /* session rail */
+  .rail { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 6px; align-items: center; }
+  .step { font-family: var(--mono); font-size: 13px; background: var(--surface); color: var(--ink-2);
+          border: 1px solid var(--line); border-radius: var(--radius); padding: 7px 11px; cursor: pointer; }
+  .step[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  .step.verify { border-style: dashed; }
+  .step:focus-visible, .play:focus-visible, .skill-head:focus-visible { outline: 2px solid var(--skill); outline-offset: 2px; }
+  .play { margin-left: auto; font: 500 13px/1 var(--sans); background: var(--skill); color: #fff; border: 0;
+          border-radius: var(--radius); padding: 9px 14px; cursor: pointer; }
+  :root[data-theme="dark"] .play, :root:not([data-theme="light"]) .play { color: #06201d; }
+
+  .caption { color: var(--ink-3); font-size: 13px; min-height: 20px; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; margin-top: 14px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  .panel > .panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+                         padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .panel-head .hint { font-size: 12px; color: var(--ink-3); }
+  .panel-body { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  .turn { display: flex; flex-direction: column; gap: 9px; }
+  .turn + .turn { border-top: 1px dashed var(--line); padding-top: 16px; }
+  .said { display: flex; gap: 9px; align-items: baseline; }
+  .who { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); flex: 0 0 52px; }
+  .said p { color: var(--ink); }
+  .shell { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+  .shell div { font-family: var(--mono); font-size: 12.5px; white-space: pre; }
+  .cmd { color: var(--ink); }
+  .cmd::before { content: "$ "; color: var(--ink-3); }
+  .out { color: var(--ink-3); }
+  .out.bad { color: var(--shift); }
+  .rounds { font-size: 12px; color: var(--ink-3); }
+  .rounds b { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+  .event { display: flex; gap: 10px; align-items: flex-start; background: var(--shift-soft); color: var(--shift);
+           border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+  .review { display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); border-radius: 8px; padding: 12px; }
+  .review .eyebrow { color: var(--ink-3); }
+  .review li { font-size: 13px; color: var(--ink-2); }
+  ul { margin: 0; padding-left: 18px; }
+
+  .store h3 { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+  .store .empty { color: var(--ink-3); font-size: 13px; font-style: italic; }
+  .mem { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+  .mem li { font-size: 13.5px; border-left: 3px solid var(--memory); background: var(--memory-soft);
+            color: var(--ink); padding: 8px 10px; border-radius: 0 8px 8px 0; }
+  .skills { display: flex; flex-direction: column; gap: 8px; }
+  .skill { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .skill-head { width: 100%; text-align: left; background: var(--skill-soft); border: 0; cursor: pointer;
+                padding: 9px 11px; display: flex; gap: 8px; align-items: baseline; font-family: var(--sans); }
+  .skill-head .name { font-family: var(--mono); font-size: 12.5px; color: var(--skill); font-weight: 500; }
+  .skill-head .desc { font-size: 12.5px; color: var(--ink-2); flex: 1; }
+  .skill-head .chev { color: var(--ink-3); font-size: 11px; }
+  .skill pre { margin: 0; padding: 11px; background: var(--surface); font-family: var(--mono); font-size: 12px;
+               color: var(--ink-2); white-space: pre-wrap; border-top: 1px solid var(--line); }
+  .is-new { animation: flash 1.1s ease-out; }
+  @keyframes flash { from { box-shadow: inset 0 0 0 2px var(--skill); } to { box-shadow: none; } }
+  @media (prefers-reduced-motion: reduce) { .is-new { animation: none; } }
+  .tag-new { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+             color: var(--skill); border: 1px solid currentColor; border-radius: 4px; padding: 1px 4px; }
+
+  /* verification */
+  .verify-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .verify-grid { grid-template-columns: minmax(0, 1fr); } }
+  .checks { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .checks li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--ink); }
+  .checks .mark { color: var(--ok); font-weight: 600; font-family: var(--mono); }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: baseline; }
+  figure { margin: 0; }
+  figcaption { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+  .context { background: var(--surface-2); border-radius: 8px; padding: 12px; font-family: var(--mono);
+             font-size: 12px; color: var(--ink-2); white-space: pre-wrap; max-height: 320px; overflow: auto; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  footer { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 16px; color: var(--ink-3); font-size: 13px; }
+  footer p + p { margin-top: 8px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Muscle Memory</p>
+    <h1>An agent that gets better across sessions</h1>
+    <p class="lede">Twelve conversations, six sessions, one profile folder. Nothing carries over between
+      sessions except the files the reviewer writes — and by session seven the same four requests take
+      less work and follow the user's standing instructions.</p>
+    <div class="row">
+      <span class="badge" id="mode-badge">offline run</span>
+      <span class="badge" id="count-badge"></span>
+      <a href="https://github.com/msathiyakeerthi/musclememory">github.com/msathiyakeerthi/musclememory</a>
+    </div>
+  </header>
+
+  <nav class="rail" id="rail" aria-label="Sessions"></nav>
+  <p class="caption" id="caption"></p>
+
+  <div class="grid">
+    <section class="panel" aria-live="polite">
+      <div class="panel-head">
+        <h2 id="session-title">Session 1</h2>
+        <span class="hint" id="session-hint"></span>
+      </div>
+      <div class="panel-body" id="transcript"></div>
+    </section>
+
+    <aside class="panel store">
+      <div class="panel-head">
+        <h2>The store, after this session</h2>
+        <span class="hint">plain files on disk</span>
+      </div>
+      <div class="panel-body">
+        <div>
+          <h3>Memory — loaded in every session</h3>
+          <ul class="mem" id="memory"></ul>
+        </div>
+        <div>
+          <h3>Skills — index always, body on demand</h3>
+          <div class="skills" id="skills"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="panel" style="margin-top:18px">
+    <div class="panel-head">
+      <h2>Session 7 — the proof</h2>
+      <span class="hint">a fresh session, same four requests</span>
+    </div>
+    <div class="panel-body verify-grid">
+      <div>
+        <ul class="checks" id="checks"></ul>
+        <figure style="margin-top:20px">
+          <div class="legend">
+            <span><span class="swatch" style="background:var(--before)"></span>first time</span>
+            <span><span class="swatch" style="background:var(--skill)"></span>after learning</span>
+          </div>
+          <div id="chart"></div>
+          <figcaption>Tool-calling rounds per request. Fewer rounds is less latency, fewer tokens and fewer
+            chances to get it wrong.</figcaption>
+        </figure>
+      </div>
+      <div>
+        <h3 class="eyebrow" style="margin-bottom:8px">What session 7 starts with</h3>
+        <div class="context" id="context"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>How honest is this?</strong> The store, the guards, the review pipeline, the counters and the
+      CLI are the real library. In an offline run two parts are rule-based stand-ins: the agent (it reads its
+      own learned context and runs the steps written in whichever skill it loads) and the reviewer (it reads
+      the transcript from the real review prompt). No branch anywhere looks at the session number.</p>
+    <p>Reproduce it: <code>python examples/multi_session_demo.py</code>, or
+      <code>python examples/multi_session_demo.py --real</code> to let Claude be both the agent and the
+      reviewer.</p>
+  </footer>
+</div>
+
+<script>
+const TRACE = {"mode":"offline","model":null,"sessions":[{"number":1,"conversations":[{"user":"I teach a Python class. Always answer in exactly 3 short bullets.","reply":"It is a Python construct. Used for readable, compact code. Common in the standard library.","task":"explain","rounds":0,"commands":[],"steps":[],"deployed":[]},{"user":"Deploy the service to staging.","reply":"Released v1.4.2 to staging. Used `make ship`. No migrations pending.","task":"deploy","rounds":3,"commands":["npm run deploy","cat Makefile","make ship"],"steps":[{"cmd":"npm run deploy","out":"error: missing script 'deploy'"},{"cmd":"cat Makefile","out":"ship:\n\tNODE_ENV=production ./build && ./release"},{"cmd":"make ship","out":"released v1.4.2"}],"deployed":["make ship"]}],"learned":["learned: memory add [user]: Always answer in exactly 3 short bullets.; skill create: deploy-python-service"],"world_event":null,"store":{"memory":{"user":["Always answer in exactly 3 short bullets."],"memory":[]},"skills":[{"name":"deploy-python-service","description":"Deploy the Python service to staging or production.","use_count":0,"body":"---\nname: deploy-python-service\ndescription: \"Deploy the Python service to staging or production.\"\n---\n\n1. Run `make ship`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- `npm run deploy` does not work here; run `make ship` instead.\n"}],"ledger":[{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Always answer in exactly 3 short bullets."},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: deploy-python-service"}]}},{"number":2,"conversations":[{"user":"What is a list comprehension?","reply":"- It is a Python construct\n- Used for readable, compact code\n- Common in the standard library","task":"explain","rounds":0,"commands":[],"steps":[],"deployed":[]},{"user":"The integration tests are failing again - can you fix them?","reply":"- Started the db container\n- 12 tests pass\n- Failure was a missing database, not the code","task":"tests","rounds":4,"commands":["pytest -q","docker compose ps","docker compose up -d db","pytest -q"],"steps":[{"cmd":"pytest -q","out":"E  psycopg.OperationalError: connection refused (is the db container up?)\n2 failed"},{"cmd":"docker compose ps","out":"NAME    STATUS\napi     running"},{"cmd":"docker compose up -d db","out":"Container db  Started"},{"cmd":"pytest -q","out":"12 passed in 4.1s"}],"deployed":[]}],"learned":["learned: skill create: fix-flaky-integration-tests"],"world_event":null,"store":{"memory":{"user":["Always answer in exactly 3 short bullets."],"memory":[]},"skills":[{"name":"deploy-python-service","description":"Deploy the Python service to staging or production.","use_count":0,"body":"---\nname: deploy-python-service\ndescription: \"Deploy the Python service to staging or production.\"\n---\n\n1. Run `make ship`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- `npm run deploy` does not work here; run `make ship` instead.\n"},{"name":"fix-flaky-integration-tests","description":"Fix integration tests that fail on a missing database.","use_count":0,"body":"---\nname: fix-flaky-integration-tests\ndescription: \"Fix integration tests that fail on a missing database.\"\n---\n\n1. Run `docker compose up -d db`.\n2. Run `pytest -q`.\n3. Check the output before reporting success.\n\n## Pitfalls\n- `pytest -q` fails until `docker compose up -d db` has run first.\n"}],"ledger":[{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Always answer in exactly 3 short bullets."},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: deploy-python-service"},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: fix-flaky-integration-tests"}]}},{"number":3,"conversations":[{"user":"Never deploy on a Friday without asking me first.","reply":"- Released v1.4.2 to staging\n- Used `make ship`\n- No migrations pending","task":"deploy","rounds":1,"commands":["make ship"],"steps":[{"cmd":"make ship","out":"released v1.4.2"}],"deployed":["make ship"]},{"user":"Draft the release notes for v1.4.","reply":"- 3 changes since v1.3\n- Grouped as fix / feat / chore\n- Drafted in release-notes.md","task":"notes","rounds":2,"commands":["git log --oneline","git log --pretty=format:'- %s'"],"steps":[{"cmd":"git log --oneline","out":"a1b2c3d fix: retry on 502\nd4e5f6a feat: bulk export\n9f8e7d6 chore: bump deps"},{"cmd":"git log --pretty=format:'- %s'","out":"- fix: retry on 502\n- feat: bulk export\n- chore: bump deps"}],"deployed":[]}],"learned":["learned: memory add [user]: Never deploy on a Friday without asking me first.; skill create: write-release-notes"],"world_event":null,"store":{"memory":{"user":["Always answer in exactly 3 short bullets.","Never deploy on a Friday without asking me first."],"memory":[]},"skills":[{"name":"deploy-python-service","description":"Deploy the Python service to staging or production.","use_count":1,"body":"---\nname: deploy-python-service\ndescription: \"Deploy the Python service to staging or production.\"\n---\n\n1. Run `make ship`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- `npm run deploy` does not work here; run `make ship` instead.\n"},{"name":"fix-flaky-integration-tests","description":"Fix integration tests that fail on a missing database.","use_count":0,"body":"---\nname: fix-flaky-integration-tests\ndescription: \"Fix integration tests that fail on a missing database.\"\n---\n\n1. Run `docker compose up -d db`.\n2. Run `pytest -q`.\n3. Check the output before reporting success.\n\n## Pitfalls\n- `pytest -q` fails until `docker compose up -d db` has run first.\n"},{"name":"write-release-notes","description":"Draft release notes from the git log.","use_count":0,"body":"---\nname: write-release-notes\ndescription: \"Draft release notes from the git log.\"\n---\n\n1. Run `git log --pretty=format:'- %s'`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- Go straight to `git log --pretty=format:'- %s'`; the other forms of it waste a round.\n"}],"ledger":[{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Always answer in exactly 3 short bullets."},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: deploy-python-service"},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: fix-flaky-integration-tests"},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Never deploy on a Friday without asking me first."},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"skill.create","summary":"skill create: write-release-notes"}]}},{"number":4,"conversations":[{"user":"Deploy the service to staging.","reply":"- Released v1.4.2 to staging\n- Used `make ship`\n- No migrations pending","task":"deploy","rounds":1,"commands":["make ship"],"steps":[{"cmd":"make ship","out":"released v1.4.2"}],"deployed":["make ship"]},{"user":"What is a decorator?","reply":"- It is a Python construct\n- Used for readable, compact code\n- Common in the standard library","task":"explain","rounds":0,"commands":[],"steps":[],"deployed":[]}],"learned":["nothing to save"],"world_event":"the release script now refuses a deploy without VERSION set","store":{"memory":{"user":["Always answer in exactly 3 short bullets.","Never deploy on a Friday without asking me first."],"memory":[]},"skills":[{"name":"deploy-python-service","description":"Deploy the Python service to staging or production.","use_count":2,"body":"---\nname: deploy-python-service\ndescription: \"Deploy the Python service to staging or production.\"\n---\n\n1. Run `make ship`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- `npm run deploy` does not work here; run `make ship` instead.\n"},{"name":"fix-flaky-integration-tests","description":"Fix integration tests that fail on a missing database.","use_count":0,"body":"---\nname: fix-flaky-integration-tests\ndescription: \"Fix integration tests that fail on a missing database.\"\n---\n\n1. Run `docker compose up -d db`.\n2. Run `pytest -q`.\n3. Check the output before reporting success.\n\n## Pitfalls\n- `pytest -q` fails until `docker compose up -d db` has run first.\n"},{"name":"write-release-notes","description":"Draft release notes from the git log.","use_count":0,"body":"---\nname: write-release-notes\ndescription: \"Draft release notes from the git log.\"\n---\n\n1. Run `git log --pretty=format:'- %s'`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- Go straight to `git log --pretty=format:'- %s'`; the other forms of it waste a round.\n"}],"ledger":[{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Always answer in exactly 3 short bullets."},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: deploy-python-service"},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: fix-flaky-integration-tests"},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Never deploy on a Friday without asking me first."},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"skill.create","summary":"skill create: write-release-notes"}]}},{"number":5,"conversations":[{"user":"It's Friday - deploy v1.4 to production.","reply":"Just to check first - you asked me never to deploy on a Friday without asking. Go ahead?","task":"deploy","rounds":0,"commands":[],"steps":[],"deployed":[]},{"user":"Ok, go ahead and deploy v1.4.","reply":"- Released v1.4.2 to staging\n- Used `make ship`\n- No migrations pending","task":"deploy","rounds":2,"commands":["make ship","VERSION=v1.4 make ship"],"steps":[{"cmd":"make ship","out":"error: refusing to release: VERSION not set"},{"cmd":"VERSION=v1.4 make ship","out":"released v1.4.2"}],"deployed":["VERSION=v1.4 make ship"]}],"learned":["learned: skill patch: deploy-python-service"],"world_event":null,"store":{"memory":{"user":["Always answer in exactly 3 short bullets.","Never deploy on a Friday without asking me first."],"memory":[]},"skills":[{"name":"deploy-python-service","description":"Deploy the Python service to staging or production.","use_count":4,"body":"---\nname: deploy-python-service\ndescription: \"Deploy the Python service to staging or production.\"\n---\n\n1. Run `VERSION=v1.4 make ship` - plain `make ship` is refused now.\n2. Check the output before reporting success.\n\n## Pitfalls\n- `npm run deploy` does not work here; run `make ship` instead.\n"},{"name":"fix-flaky-integration-tests","description":"Fix integration tests that fail on a missing database.","use_count":0,"body":"---\nname: fix-flaky-integration-tests\ndescription: \"Fix integration tests that fail on a missing database.\"\n---\n\n1. Run `docker compose up -d db`.\n2. Run `pytest -q`.\n3. Check the output before reporting success.\n\n## Pitfalls\n- `pytest -q` fails until `docker compose up -d db` has run first.\n"},{"name":"write-release-notes","description":"Draft release notes from the git log.","use_count":0,"body":"---\nname: write-release-notes\ndescription: \"Draft release notes from the git log.\"\n---\n\n1. Run `git log --pretty=format:'- %s'`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- Go straight to `git log --pretty=format:'- %s'`; the other forms of it waste a round.\n"}],"ledger":[{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Always answer in exactly 3 short bullets."},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: deploy-python-service"},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: fix-flaky-integration-tests"},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Never deploy on a Friday without asking me first."},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"skill.create","summary":"skill create: write-release-notes"},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"skill.patch","summary":"skill patch: deploy-python-service"}]}},{"number":6,"conversations":[{"user":"Draft the release notes for v1.5.","reply":"- 3 changes since v1.3\n- Grouped as fix / feat / chore\n- Drafted in release-notes.md","task":"notes","rounds":1,"commands":["git log --pretty=format:'- %s'"],"steps":[{"cmd":"git log --pretty=format:'- %s'","out":"- fix: retry on 502\n- feat: bulk export\n- chore: bump deps"}],"deployed":[]},{"user":"Deploy v1.5 to staging.","reply":"- Released v1.4.2 to staging\n- Used `make ship`\n- No migrations pending","task":"deploy","rounds":1,"commands":["VERSION=v1.4 make ship"],"steps":[{"cmd":"VERSION=v1.4 make ship","out":"released v1.4.2"}],"deployed":["VERSION=v1.4 make ship"]}],"learned":["nothing to save"],"world_event":null,"store":{"memory":{"user":["Always answer in exactly 3 short bullets.","Never deploy on a Friday without asking me first."],"memory":[]},"skills":[{"name":"deploy-python-service","description":"Deploy the Python service to staging or production.","use_count":5,"body":"---\nname: deploy-python-service\ndescription: \"Deploy the Python service to staging or production.\"\n---\n\n1. Run `VERSION=v1.4 make ship` - plain `make ship` is refused now.\n2. Check the output before reporting success.\n\n## Pitfalls\n- `npm run deploy` does not work here; run `make ship` instead.\n"},{"name":"fix-flaky-integration-tests","description":"Fix integration tests that fail on a missing database.","use_count":0,"body":"---\nname: fix-flaky-integration-tests\ndescription: \"Fix integration tests that fail on a missing database.\"\n---\n\n1. Run `docker compose up -d db`.\n2. Run `pytest -q`.\n3. Check the output before reporting success.\n\n## Pitfalls\n- `pytest -q` fails until `docker compose up -d db` has run first.\n"},{"name":"write-release-notes","description":"Draft release notes from the git log.","use_count":1,"body":"---\nname: write-release-notes\ndescription: \"Draft release notes from the git log.\"\n---\n\n1. Run `git log --pretty=format:'- %s'`.\n2. Check the output before reporting success.\n\n## Pitfalls\n- Go straight to `git log --pretty=format:'- %s'`; the other forms of it waste a round.\n"}],"ledger":[{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Always answer in exactly 3 short bullets."},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: deploy-python-service"},{"ts":"2026-09-23T21:07:31+00:00","actor":"review","action":"skill.create","summary":"skill create: fix-flaky-integration-tests"},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"memory.add","summary":"memory add [user]: Never deploy on a Friday without asking me first."},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"skill.create","summary":"skill create: write-release-notes"},{"ts":"2026-09-23T21:07:32+00:00","actor":"review","action":"skill.patch","summary":"skill patch: deploy-python-service"}]}}],"verification":{"context":"# Learned context\n\nYou wrote the notes below in earlier conversations. Rely on them; correct them when they are wrong.\n\n## About the user\n- Always answer in exactly 3 short bullets.\n- Never deploy on a Friday without asking me first.\n\n## Skills\nBefore a task that one of these covers, load it with `skill_view` and follow it.\n- deploy-python-service: Deploy the Python service to staging or production.\n- fix-flaky-integration-tests: Fix integration tests that fail on a missing database.\n- write-release-notes: Draft release notes from the git log.\n\n## Saving what you learn\nUse `memory` to save a durable fact about the user or the environment. Use `skill_manage` to save or fix a reusable procedure after a non-trivial task. A reviewer also does this after the conversation, so never interrupt the user's task just to save something.","conversations":[{"user":"What is a context manager?","reply":"- It is a Python construct\n- Used for readable, compact code\n- Common in the standard library","task":"explain","rounds":0,"commands":[],"steps":[],"deployed":[],"probe":"format"},{"user":"Deploy the service to staging.","reply":"- Released v1.4.2 to staging\n- Used `make ship`\n- No migrations pending","task":"deploy","rounds":1,"commands":["VERSION=v1.4 make ship"],"steps":[{"cmd":"VERSION=v1.4 make ship","out":"released v1.4.2"}],"deployed":["VERSION=v1.4 make ship"],"probe":"deploy"},{"user":"It's Friday - please deploy v1.5 to production.","reply":"Just to check first - you asked me never to deploy on a Friday without asking. Go ahead?","task":"deploy","rounds":0,"commands":[],"steps":[],"deployed":[],"probe":"friday"},{"user":"The integration tests are failing again.","reply":"- Started the db container\n- 12 tests pass\n- Failure was a missing database, not the code","task":"tests","rounds":2,"commands":["docker compose up -d db","pytest -q"],"steps":[{"cmd":"docker compose up -d db","out":"Container db  Started"},{"cmd":"pytest -q","out":"12 passed in 4.1s"}],"deployed":[],"probe":"tests"}],"checks":[{"label":"preference: answers in 3 bullets","ok":true},{"label":"preference: asks before a Friday production deploy","ok":true},{"label":"skill: deploy takes 1 tool round and succeeds first try (was 3)","ok":true},{"label":"skill: flaky tests take 2 tool rounds (was 4)","ok":true}],"baseline":{"explain":0,"deploy":3,"tests":4,"notes":2}}};
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const bad = (out) => /error|failed|refus/i.test(out);
+
+const sessions = TRACE.sessions;
+const verification = TRACE.verification;
+const VIEWS = sessions.length + 1;          // the six sessions plus the verification session
+let current = 0, timer = null;
+
+const SUMMARY = {
+  1: "The user states a preference, then a deploy is worked out the hard way.",
+  2: "A question, then failing tests traced to a stopped database container.",
+  3: "A second standing instruction, and release notes drafted by trial and error.",
+  4: "Both requests are already covered — the reviewer saves nothing.",
+  5: "The release script has changed, so the learned procedure now fails.",
+  6: "Everything runs first try; nothing new to learn.",
+};
+
+/* ---------------------------------------------------------------- rail */
+function buildRail() {
+  const rail = $("rail");
+  sessions.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.className = "step";
+    b.type = "button";
+    b.textContent = "Session " + s.number;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => { stop(); show(i); });
+    rail.append(b);
+  });
+  const v = document.createElement("button");
+  v.className = "step verify";
+  v.type = "button";
+  v.textContent = "Session 7 — verify";
+  v.setAttribute("aria-pressed", "false");
+  v.addEventListener("click", () => { stop(); show(sessions.length); });
+  rail.append(v);
+
+  const play = document.createElement("button");
+  play.className = "play";
+  play.type = "button";
+  play.id = "play";
+  play.textContent = "Play the run";
+  play.addEventListener("click", toggle);
+  rail.append(play);
+}
+
+function toggle() {
+  if (timer) { stop(); return; }
+  $("play").textContent = "Pause";
+  show(current >= VIEWS - 1 ? 0 : current);
+  timer = setInterval(() => {
+    if (current >= VIEWS - 1) { stop(); return; }
+    show(current + 1);
+  }, 3400);
+}
+function stop() { clearInterval(timer); timer = null; $("play").textContent = "Play the run"; }
+
+/* ---------------------------------------------------------------- render */
+function turnHtml(c) {
+  const steps = (c.steps || []).map((s) =>
+    `<div class="cmd">${esc(s.cmd)}</div><div class="out${bad(s.out) ? " bad" : ""}">${esc(s.out)}</div>`).join("");
+  return `<div class="turn">
+      <div class="said"><span class="who">User</span><p>${esc(c.user)}</p></div>
+      ${steps ? `<div class="shell">${steps}</div>` : ""}
+      <div class="said"><span class="who">Agent</span><p>${esc(c.reply).replace(/\n/g, "<br>")}</p></div>
+      <p class="rounds"><b>${c.rounds}</b> tool-calling round${c.rounds === 1 ? "" : "s"}</p>
+    </div>`;
+}
+
+function show(index) {
+  current = index;
+  document.querySelectorAll(".step").forEach((b, i) => b.setAttribute("aria-pressed", String(i === index)));
+
+  const isVerify = index === sessions.length;
+  const session = isVerify ? null : sessions[index];
+  const conversations = isVerify ? verification.conversations : session.conversations;
+
+  $("session-title").textContent = isVerify ? "Session 7 — a fresh session" : "Session " + session.number;
+  $("session-hint").textContent = isVerify
+    ? "nothing carried over but the store"
+    : conversations.length + " conversations";
+  $("caption").textContent = isVerify
+    ? "The same four kinds of request, answered by an agent that has read what earlier sessions wrote."
+    : (SUMMARY[session.number] || "");
+
+  const parts = conversations.map(turnHtml);
+  if (!isVerify && session.world_event) {
+    parts.push(`<div class="event"><span aria-hidden="true">&#9888;</span>
+      <span><strong>The environment changed.</strong> ${esc(session.world_event)} — so the procedure
+      learned in session 1 is now wrong.</span></div>`);
+  }
+  if (!isVerify) {
+    const learned = session.learned.length
+      ? `<ul>${session.learned.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>`
+      : `<p class="rounds">Nothing to save — saving nothing is the right answer when a session
+         reveals nothing new.</p>`;
+    parts.push(`<div class="review"><p class="eyebrow">Review, after the replies were shown</p>${learned}</div>`);
+  }
+  $("transcript").innerHTML = parts.join("");
+
+  const store = isVerify ? sessions[sessions.length - 1].store : session.store;
+  const prev = index > 0 && !isVerify ? sessions[index - 1].store : (isVerify ? store : null);
+  renderStore(store, prev);
+}
+
+function renderStore(store, prev) {
+  const known = new Set(prev ? prev.memory.user : []);
+  const entries = store.memory.user;
+  $("memory").innerHTML = entries.length
+    ? entries.map((e) => `<li class="${known.has(e) ? "" : "is-new"}">${esc(e)}</li>`).join("")
+    : `<li class="empty" style="border:0;background:none;padding:0">nothing learned yet</li>`;
+
+  const before = new Map((prev ? prev.skills : []).map((s) => [s.name, s.body]));
+  $("skills").innerHTML = store.skills.length
+    ? store.skills.map((s, i) => {
+        const state = !before.has(s.name) ? "new" : (before.get(s.name) !== s.body ? "patched" : "");
+        return `<div class="skill ${state ? "is-new" : ""}">
+          <button class="skill-head" type="button" aria-expanded="false" data-skill="${i}">
+            <span class="name">${esc(s.name)}</span>
+            <span class="desc">${esc(s.description)}</span>
+            ${state ? `<span class="tag-new">${state}</span>` : ""}
+            <span class="chev" aria-hidden="true">&#9662;</span>
+          </button>
+          <pre hidden>${esc(s.body.trim())}</pre>
+        </div>`;
+      }).join("")
+    : `<p class="empty">no skills yet</p>`;
+
+  document.querySelectorAll(".skill-head").forEach((head) => {
+    head.addEventListener("click", () => {
+      const body = head.nextElementSibling;
+      body.hidden = !body.hidden;
+      head.setAttribute("aria-expanded", String(!body.hidden));
+    });
+  });
+}
+
+/* ---------------------------------------------------------------- verification */
+function renderVerification() {
+  $("checks").innerHTML = verification.checks.map((c) =>
+    `<li><span class="mark" aria-hidden="true">${c.ok ? "PASS" : "FAIL"}</span>
+       <span><span class="sr-only">${c.ok ? "Passed: " : "Failed: "}</span>${esc(c.label)}</span></li>`).join("");
+  $("context").textContent = verification.context.trim();
+
+  const byProbe = Object.fromEntries(verification.conversations.map((c) => [c.probe, c]));
+  const rows = [
+    { label: "Deploy the service", before: verification.baseline.deploy, after: byProbe.deploy.rounds },
+    { label: "Fix the failing tests", before: verification.baseline.tests, after: byProbe.tests.rounds },
+  ];
+  $("chart").innerHTML = chart(rows);
+}
+
+function chart(rows) {
+  const W = 420, rowH = 62, padL = 8, padR = 44, top = 10;
+  const H = top + rows.length * rowH;
+  const max = Math.max(...rows.flatMap((r) => [r.before, r.after]));
+  const scale = (v) => (v / max) * (W - padL - padR);
+  const bars = rows.map((r, i) => {
+    const y = top + i * rowH;
+    const bar = (v, offset, fill) => {
+      const w = Math.max(scale(v), 2);
+      return `<rect x="${padL}" y="${y + offset}" width="${w}" height="12" rx="4" style="fill:${fill}"></rect>
+        <text x="${padL + w + 8}" y="${y + offset + 10}" font-family="IBM Plex Mono, monospace" font-size="12"
+              style="fill:var(--ink-2)">${v}</text>`;
+    };
+    return `<text x="${padL}" y="${y + 10}" font-family="IBM Plex Sans, sans-serif" font-size="12.5"
+                  style="fill:var(--ink)">${esc(r.label)}</text>
+      ${bar(r.before, 18, "var(--before)")}
+      ${bar(r.after, 34, "var(--skill)")}`;
+  }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img"
+      aria-label="${rows.map((r) => `${r.label}: ${r.before} rounds first time, ${r.after} after learning`).join("; ")}">
+      ${bars}</svg>`;
+}
+
+/* ---------------------------------------------------------------- boot */
+$("mode-badge").textContent = TRACE.mode === "real" ? `real run — ${TRACE.model}` : "offline run — stand-ins";
+$("count-badge").textContent =
+  sessions.reduce((n, s) => n + s.conversations.length, 0) + " conversations · " + sessions.length + " sessions";
+buildRail();
+renderVerification();
+show(0);
+</script>

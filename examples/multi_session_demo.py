@@ -87,14 +87,18 @@ class World:
         self.db_up = False
         self.requires_version = False   # flipped mid-demo: the environment moves on
         self.commands: list[str] = []   # every command of the current conversation
+        self.steps: list[dict] = []     # the same commands with their output, for the trace
         self.deployed: list[str] = []
 
     def start_turn(self) -> None:
-        self.commands = []
-        self.deployed = []
+        self.commands, self.steps, self.deployed = [], [], []
 
     def shell(self, cmd: str) -> str:
-        cmd = (cmd or "").strip()
+        output = self._run((cmd or "").strip())
+        self.steps.append({"cmd": (cmd or "").strip(), "out": output})
+        return output
+
+    def _run(self, cmd: str) -> str:
         self.commands.append(cmd)
         if cmd.startswith("npm run deploy"):
             return "error: missing script 'deploy'"
@@ -363,10 +367,11 @@ def run_conversation(agent, session, system: str, world: World, user_text: str, 
     session.end_turn(history)   # after the reply would have been shown
     return {"user": user_text, "reply": reply, "task": classify(user_text),
             "rounds": count_tool_rounds(normalize(turn)), "commands": list(world.commands),
-            "deployed": list(world.deployed)}
+            "steps": list(world.steps), "deployed": list(world.deployed)}
 
 
-def run_session(make_agent, make_llm, root: Path, world: World, turns: list[str], verbose: bool) -> list[dict]:
+def run_session(make_agent, make_llm, root: Path, world: World, turns: list[str],
+                verbose: bool) -> tuple[list[dict], list[str]]:
     """One session = one SelfLearner over the shared profile, the way a separate process would."""
     learned: list[str] = []
     config = LearnerConfig(background=False)  # inline reviews keep the demo's output in order
@@ -385,7 +390,23 @@ def run_session(make_agent, make_llm, root: Path, world: World, turns: list[str]
                 print("      " + result["reply"].replace("\n", "\n      "))
     for line in learned:
         print(f"    [review] {line}")
-    return results
+    return results, learned
+
+
+def snapshot(store_root: Path) -> dict:
+    """What the store holds right now — the trace's evidence that learning is just files."""
+    from musclememory.library import Library
+    from musclememory.store import FileStore
+
+    lib = Library(FileStore(store_root))
+    return {
+        "memory": {target: lib.memory(target) for target in ("user", "memory")},
+        "skills": [{"name": s.name, "description": s.description, "use_count": s.use_count,
+                    "body": (lib.get_skill(s.name).content if lib.get_skill(s.name) else "")}
+                   for s in lib.skills()],
+        "ledger": [{"ts": e.get("ts"), "actor": e.get("actor"), "action": e.get("action"),
+                    "summary": e.get("summary")} for e in lib.ledger()],
+    }
 
 
 def summarize(store_root: Path) -> None:
@@ -401,15 +422,16 @@ def summarize(store_root: Path) -> None:
         print(f"    - {info.name}: {info.description}  [{info.origin}, used {info.use_count}x]")
 
 
-def verify(make_agent, make_llm, root: Path, world: World, baseline: dict) -> bool:
+def verify(make_agent, make_llm, root: Path, world: World, baseline: dict, trace: dict | None = None) -> bool:
     """A fresh session, the four task classes again, and one check per class."""
     config = LearnerConfig(background=False)
     learner = SelfLearner(root, llm=make_llm(), config=config)
     results = {}
     with learner, learner.session() as session:
-        system = BASE_SYSTEM + "\n\n" + session.system_prompt()
+        context = session.system_prompt()
+        system = BASE_SYSTEM + "\n\n" + context
         print("\n  the new session's learned context:\n")
-        print("    " + session.system_prompt().replace("\n", "\n    ").strip())
+        print("    " + context.replace("\n", "\n    ").strip())
         agent, history = make_agent(world), []
         for label, text in PROBES:
             results[label] = run_conversation(agent, session, system, world, text, history)
@@ -428,6 +450,13 @@ def verify(make_agent, make_llm, root: Path, world: World, baseline: dict) -> bo
     print()
     for label, ok in checks:
         print(f"  [{'ok' if ok else 'XX'}] {label}")
+    if trace is not None:
+        trace["verification"] = {
+            "context": context,
+            "conversations": [dict(results[label], probe=label) for label, _text in PROBES],
+            "checks": [{"label": label, "ok": ok} for label, ok in checks],
+            "baseline": baseline,
+        }
     return all(ok for _label, ok in checks)
 
 
@@ -437,6 +466,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--real", action="store_true", help="use Claude for the agent and the reviewer")
     parser.add_argument("--model", default="claude-opus-5")
     parser.add_argument("--quiet", action="store_true", help="only the summary and the checks")
+    parser.add_argument("--trace", metavar="FILE.json", help="write the whole run as JSON (feeds the demo UI)")
     args = parser.parse_args(argv)
     getattr(sys.stdout, "reconfigure", lambda **_: None)(errors="replace")
 
@@ -461,17 +491,27 @@ def main(argv: list[str] | None = None) -> int:
 
     world = World()
     baseline: dict[str, int] = {}
+    trace: dict = {"mode": "real" if args.real else "offline", "model": args.model if args.real else None,
+                   "sessions": []}
     for number, turns in enumerate(SESSIONS, 1):
         print(f"\n--- session {number} ---")
-        for result in run_session(make_agent, make_llm, root, world, turns, verbose=not args.quiet):
+        results, learned = run_session(make_agent, make_llm, root, world, turns, verbose=not args.quiet)
+        for result in results:
             baseline.setdefault(result["task"], result["rounds"])
+        event = None
         if number == WORLD_CHANGE_AFTER_SESSION:
             world.requires_version = True
-            print("    [world] the release script now refuses a deploy without VERSION set")
+            event = "the release script now refuses a deploy without VERSION set"
+            print(f"    [world] {event}")
+        trace["sessions"].append({"number": number, "conversations": results, "learned": learned,
+                                  "world_event": event, "store": snapshot(root)})
 
     summarize(root)
     print("\n=== session 7: a new conversation, nothing carried over but the store ===")
-    ok = verify(make_agent, make_llm, root, world, baseline)
+    ok = verify(make_agent, make_llm, root, world, baseline, trace)
+    if args.trace:
+        Path(args.trace).write_text(json.dumps(trace, indent=1), encoding="utf-8")
+        print(f"\ntrace written to {args.trace}")
     print(f"\n{'all checks passed' if ok else 'SOME CHECKS FAILED'} — profile kept at {root.resolve()}")
     print(f"  musclememory --dir {root} skills\n  musclememory --dir {root} ledger")
     return 0 if ok else 1
